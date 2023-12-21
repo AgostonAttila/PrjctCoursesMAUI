@@ -1,0 +1,35 @@
+﻿@page "/"
+
+@inject IDialogService DialogService
+@inject ICourseService _courseService;
+@inject AppState AppState
+
+@implements IDisposable
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudCardContent>
+        <Row Class="d-flex flex-column flex-grow-1 gap-6" Elevation="0">
+            <InfoCard CourseList="CourseList" />
+            <CourseTable Courses="CourseList" />
+        </Row>
+    </MudCardContent>
+    <MudCardActions>
+    </MudCardActions>
+</MudContainer>
+
+
+
+@code {
+    public List<CourseModel>? CourseList = new List<CourseModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        CourseList =  await _courseService.GetAllCourse();     
+        AppState.OnChange += StateHasChanged;
+        AppState.SetCourseList(CourseList);
+    }
+
+    public void Dispose() => AppState.OnChange -= StateHasChanged;
+
+}

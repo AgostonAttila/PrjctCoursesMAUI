@@ -1,0 +1,130 @@
+﻿@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+
+@inject ICourseService _courseService;
+@inject ISnackbar Snackbar;
+
+@inject AppState AppState
+
+@implements IDisposable
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12" sm="12">
+                <MudPaper Class="pa-4">
+                    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                        <MudTextField T="string" Label="Name" Required="true" @bind-Value="@Course.Name" RequiredError="Name is required!" />
+                        <MudTextField T="string" Label="Company" Required="true" @bind-Value="@Course.Company" RequiredError="Company is required!" />
+                        <MudTextField T="string" Label="Author" Required="true" @bind-Value="@Course.Author" RequiredError="Author is required!" />
+                        <MudTextField T="string" Label="Url" Required="false" @bind-Value="@Course.Url" />
+                        <MudTextField T="string" Label="Github" Required="false" @bind-Value="@Course.Github" />
+                        <div class="d-flex">
+                            <MudRadioGroup T="string" Required="true" RequiredError="Status is required" @bind-SelectedOption="@SelectedStatus">
+                                <MudRadio Color="Color.Dark" Option="@(CourseStatus.Obsolete)">Obsolete</MudRadio>
+                                <MudRadio Color="Color.Primary" Option="@(CourseStatus.Starting)">Started</MudRadio>
+                                <MudRadio Color="Color.Surface" Option="@(CourseStatus.NotStartingYet)">Not Started</MudRadio>
+                                <MudRadio Color="Color.Success" Option="@(CourseStatus.Finished)">Finished</MudRadio>
+                            </MudRadioGroup>
+                        </div>
+                        <MudSelect Margin="Margin.Dense" T="string" Required="true" RequiredError="Category is required" Label="Category" Variant="Variant.Text" @bind-Value="@Course.Category">
+                            <MudSelectItem Value="@("Web")" />
+                            <MudSelectItem Value="@("Desktop")" />
+                            <MudSelectItem Value="@("Mobile")" />
+                            <MudSelectItem Value="@("Design")" />
+                            <MudSelectItem Value="@("Devops")" />
+                            <MudSelectItem Value="@("Security")" />
+                            <MudSelectItem Value="@("Methology")" />
+                        </MudSelect>
+                        <MudTextField T="string" Label="Technology" Required="true" @bind-Value="@Course.Technology" RequiredError="Technology is required!" />
+                    </MudForm>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Save</MudButton>
+        <MudButton Color="Color.Error" OnClick="Delete">Delete</MudButton>
+        <MudButton Color="Color.Dark" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public CourseModel Course { get; set; } = new CourseModel();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+    string SelectedStatus { get; set; }
+    bool success;
+    string[] errors = { };
+      
+    protected override async Task OnInitializedAsync()
+    {
+        SelectedStatus = Course.Status;
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose() => AppState.OnChange -= StateHasChanged;
+
+    void Submit()
+    {
+        if (errors?.Length == 0)
+        {
+            Course.UserId = "891fc555-a46c-40f9-b70b-45b5823afb2b";
+            Course.Status = SelectedStatus;
+
+            if (String.IsNullOrWhiteSpace(Course.Status))
+            {
+                Snackbar.Add("Status must be filled", Severity.Warning); return;
+            }
+
+            if (String.IsNullOrWhiteSpace(Course.Category))
+            {
+                Snackbar.Add("Category must be filled", Severity.Warning); return;
+            }
+
+            if (String.IsNullOrWhiteSpace(Course.Guid))
+            {
+                _courseService.AddCourse(Course);
+                AppState.AddCourse(Course);
+            }
+            else
+            {
+                _courseService.UpdateCourse(Course);            
+                AppState.UpdateCourse(Course);
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add((errors?.Length > 0) ? errors?[0] : "Please fill it", Severity.Warning);
+        }
+
+    }
+
+    void Delete()
+    {
+        if (!String.IsNullOrWhiteSpace(Course.Guid))
+        {
+            _courseService.DeleteCourse(Course.Guid);
+            AppState.DeleteCourse(Course);
+        }
+        else
+        {
+            Snackbar.Add("Must be an existed course", Severity.Warning);
+        }
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+
+}
+
+
+
+
+
+

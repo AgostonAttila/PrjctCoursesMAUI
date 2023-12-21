@@ -1,0 +1,42 @@
+﻿@using PrjctCoursesMAUI.Services
+
+@inject ICourseService _courseService;
+@inject ISnackbar Snackbar;
+
+@inject AppState AppState
+
+@implements IDisposable
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="FilePath" Label="Standard" HelperText="Filepath" Variant="Variant.Text"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    public string? FilePath { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    protected override void OnInitialized() => AppState.OnChange += StateHasChanged;
+
+    public void Dispose() => AppState.OnChange -= StateHasChanged;
+
+    void Submit()
+    {
+        if (!String.IsNullOrWhiteSpace(FilePath))
+        {
+            List<CourseModel> courses = _courseService.UploadCourseFromCSV(FilePath).Result;
+            AppState.SetCourseList(courses);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add("Filepath is empty", Severity.Warning);
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
+}

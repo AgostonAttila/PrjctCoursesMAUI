@@ -1,0 +1,31 @@
+﻿@inject IDialogService DialogService
+@inject ICourseService _courseService;
+@inject AppState AppState
+
+@implements IDisposable
+
+
+<MudStack Row>
+    <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="@AddItem" />
+    <MudFab Color="Color.Error" Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" OnClick="@DeleteAll" />
+    <MudFab Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Upload" OnClick="@Upload" />
+</MudStack>
+
+@code {
+
+    protected override void OnInitialized() => AppState.OnChange += StateHasChanged;
+    public void Dispose() => AppState.OnChange -= StateHasChanged;
+
+    private void AddItem() => DialogService.Show<Dialog>("Add course", new DialogOptions { CloseOnEscapeKey = true, ClassBackground = "my-custom-class" });
+    private void Upload() => DialogService.Show<DialogUpload>("Upload from CSV", new DialogOptions { CloseOnEscapeKey = true });
+
+
+    private void DeleteAll()
+    {
+        _courseService.DeleteAllCourse();
+        AppState.SetCourseList(new List<CourseModel>());
+    }
+
+   
+
+}

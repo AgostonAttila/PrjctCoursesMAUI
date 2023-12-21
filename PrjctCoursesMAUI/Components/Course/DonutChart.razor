@@ -1,0 +1,32 @@
+﻿@if (Datas?.Length == 0 || Labels?.Length == 0)
+{
+    <MudCard Elevation="4" Style="width:300px ;height:300px;">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" Align="Align.Left">No Datas</MudText>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <MudCard Class="mud-theme-dark" Elevation="4" Style="width:300px ;height:225px;">
+        <MudCardContent>
+            <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Right" @bind-SelectedIndex="Index" InputData="@Datas" InputLabels="@Labels">
+                <CustomGraphics>
+                   @* <MudText Class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white"  font-size="5">@Datas.Sum().ToString()</MudText>
+                     <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@Datas.Sum().ToString()</text> *@
+                </CustomGraphics>
+            </MudChart>
+        </MudCardContent>
+    </MudCard>
+}
+
+@code {
+
+    private int Index = -1;
+
+    [Parameter]
+    public double[]? Datas { get; set; }
+
+    [Parameter]
+    public string[]? Labels { get; set; }
+}

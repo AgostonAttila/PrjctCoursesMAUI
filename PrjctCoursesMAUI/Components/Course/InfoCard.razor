@@ -1,0 +1,48 @@
+﻿<MudGrid Spacing="2" Justify="Justify.SpaceBetween">
+    <MudItem>
+        <MudPaper Class="d-flex flex-column flex-grow-1 gap-6" Elevation="0">
+            <CounterCard Title="Finished" Count="@CourseList.Where(p => p.Status == CourseStatus.Finished).Count()" Style="width:300px ;height:100px;" Class="mud-theme-success" Color="Color.Dark" />
+            <CounterCard Title="Not Started" Count="@CourseList.Where(p => p.Status == CourseStatus.NotStartingYet || p.Status == "Not Started Yet").Count()" Style="width:300px ;height:100px;" Class="mud-theme-warning" Color="Color.Dark" />
+        </MudPaper>            
+    </MudItem>
+    <MudItem>
+        <MudPaper  Class="d-flex flex-column flex-grow-1 gap-6" Elevation="0">
+            <CounterCard Title="Started" Count="@CourseList.Where(p => p.Status == CourseStatus.Starting).Count()" Style="width:300px ;height:100px;" Class="mud-theme-primary" Color="Color.Dark" />
+            <CounterCard Title="Obsolete" Count="@CourseList.Where(p => p.Status == CourseStatus.Obsolete).Count()" Style="width:300px ;height:100px;" Class="mud-theme-error" Color="Color.Dark" />
+        </MudPaper>       
+    </MudItem>  
+    <MudItem>
+        <CounterTable Group="@categoryGroup" Property="Category" />
+    </MudItem> 
+    <MudItem>
+        <CounterTable Group="@techGroup" Property="Technology" />
+    </MudItem>
+    <MudItem>
+        <DonutChart Datas="@companyDatas" Labels="@companyLabels" />
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<CourseModel> CourseList { get; set; } = new List<CourseModel>();
+
+    IEnumerable<IGrouping<string, CourseModel>> categoryGroup;
+    IEnumerable<IGrouping<string, CourseModel>> companyGroup;
+    IEnumerable<IGrouping<string, CourseModel>> techGroup;
+
+    double[] companyDatas;
+    string[] companyLabels;
+
+    protected override void OnParametersSet()
+    {
+        if (CourseList == null) return;
+
+        categoryGroup = CourseList.GroupBy(p => p.Category).OrderByDescending(p=>p.Count()).ToList();
+        companyGroup = CourseList.GroupBy(p => p.Company).OrderByDescending(p => p.Count()).ToList();
+        techGroup = CourseList.GroupBy(p => p.Technology).OrderByDescending(p => p.Count()).ToList();
+
+        companyDatas = companyGroup.Select(p => Double.Parse(p.Count().ToString())).ToArray();
+        companyLabels = companyGroup.Select(p => p.First().Company).ToArray();
+    }
+}

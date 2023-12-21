@@ -1,0 +1,57 @@
+﻿<MudCard Style="@Style" Class="@Class" Elevation="4">
+    <MudCardContent>
+        <Row Class="d-flex justify-space-between flex-grow-1 gap-4" Elevation="0">
+            <Row>
+                <MudText Typo="Typo.h6" Align="Align.Left">@Title?.ToUpper()</MudText>
+                    <MudText Align="Align.Left"><b>@Count</b></MudText>
+            </Row>
+            <Row>
+                <MudFab Color="@Color" Size="Size.Small" StartIcon="@InnerIcon" />
+            </Row>
+        </Row>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public int Count { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; } = "width:300px ;height:100px;";
+
+    [Parameter]
+    public string? Class { get; set; } = "mud-theme-primary";
+
+    [Parameter]
+    public MudBlazor.Color Color { get; set; }
+
+    string InnerIcon;
+
+    protected override void OnParametersSet()
+    {
+        switch (Title)
+        {
+            case "Finished":
+                InnerIcon = Icons.Material.Filled.Done;
+                break;
+            case "Started":
+                InnerIcon = Icons.Material.Filled.Start;
+                break;
+            case "Not Started":
+            case "Not Starting Yet":
+            case "Not Started Yet":
+                InnerIcon = Icons.Material.Filled.NotStarted;
+                break;          
+            case "Obsolete":
+                InnerIcon = Icons.Material.Filled.NotAccessible;
+                break;
+
+        }
+
+     
+    }
+
+}

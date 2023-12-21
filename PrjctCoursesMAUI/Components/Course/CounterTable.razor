@@ -1,0 +1,44 @@
+﻿@using PrjctCoursesMAUI.Models
+@using System.Reflection
+
+@if (Group?.Count() != 0)
+{
+    <MudTable Elevation="4" Style="width:300px;" Items="@Group" Hover="true" Breakpoint="Breakpoint.Sm" Loading="false" LoadingProgressColor="Color.Info" Height="225px">
+        <RowTemplate>
+            <MudTd DataLabel="#"><b>@GetPropValue(context.First(), Property)</b></MudTd>
+            <MudTd DataLabel="Nr">@context.Count()</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+else
+{
+    <MudCard Elevation="4" Style="width:300px ;height:300px;">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" Align="Align.Left">No @Property</MudText>
+        </MudCardContent>
+    </MudCard>
+}
+
+@code {
+
+    [Parameter]
+    public IEnumerable<IGrouping<string, CourseModel>> Group { get; set; }
+
+    [Parameter]
+    public string Property { get; set; }
+
+  
+
+    static object GetPropValue(object obj, string propName)
+    {
+       
+        PropertyInfo propInfo = obj.GetType().GetProperty(propName);     
+        if (propInfo == null)
+        {
+            throw new ArgumentException($"The '{propName}' named property doesnt found");
+        }      
+        object value = propInfo.GetValue(obj, null);
+        return value;
+    }
+
+}

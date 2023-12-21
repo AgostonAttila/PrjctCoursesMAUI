@@ -1,0 +1,27 @@
+﻿@using MudBlazor
+@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Fixed="false">
+        <MudIconButton Icon="@Icons.Material.Filled.List" Size="Size.Large" Color="Color.Inherit" Edge="Edge.Start" />
+        <MudText Typo="Typo.h6">Course Catalog</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Abc" Size="Size.Large" Color="Color.Inherit" />
+    </MudAppBar>
+
+  
+    <MudMainContent>       
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+  
+}
